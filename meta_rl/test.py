@@ -1,5 +1,7 @@
 from models import PrefrontalLSTM
 from training import train
+import gym
+import torch
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
@@ -9,14 +11,16 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0007)
 env = gym.make('CartPole-v1')
 loss = []
 rewards = []
-for i in tqdm(range(2000)):
+for i in tqdm(range(5000)):
     l, r = train(env, model, optimizer)
     loss.append(l)
     rewards.append(r)
 
 env.close()
 
+
 plt.plot(loss)
 plt.plot(r)
 
 plt.show()
+train(env, model, optimizer, render=True)
