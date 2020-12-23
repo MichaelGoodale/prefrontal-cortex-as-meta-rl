@@ -1,9 +1,9 @@
 #File where we define any necessary tasks for agent to learn
 import random
 
-class task1:
-    def __init__(self, reward=1):
-
+class TaskOne:
+    def __init__(self, reward=1, seed=1337):
+        self.random_generator = random.Random(seed)
         self.reward = reward
 
         self.train = True
@@ -26,9 +26,9 @@ class task1:
         self.trial = 0
 
         if self.train == True:
-            self.initial_probability[0] = random.choice([random.uniform(0,0.1), random.uniform(0.2, 0.3), random.uniform(0.4,0.5)])
+            self.initial_probability[0] = self.random_generator.choice([self.random_generator.uniform(0,0.1), self.random_generator.uniform(0.2, 0.3), self.random_generator.uniform(0.4,0.5)])
         else:
-            self.initial_probability[0] = random.uniform(0,0.5) #Is it the complement of train or uniform? P.15
+            self.initial_probability[0] = self.random_generator.uniform(0,0.5) #Is it the complement of train or uniform? P.15
 
         self.initial_probability[1] = 0.5 - self.initial_probability[0]
 
@@ -36,11 +36,13 @@ class task1:
 
         self.time_since_action = [0,0]
 
-        self.trials = random.randint(50,100)
+        self.trials = self.random_generator.randint(50,100)
+
+        return []
 
     def step(self, action):
 
-        if random.uniform(0,1)<=self.probability_reward[action]:
+        if self.random_generator.uniform(0,1)<=self.probability_reward[action]:
             r = self.reward
         else:
             r = 0
@@ -58,5 +60,5 @@ class task1:
         else:
             done = False
 
-        return r, done
+        return [], r, done, None
 
