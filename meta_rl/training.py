@@ -35,6 +35,23 @@ def update_model(rewards, values, log_prob_actions, entropies, optimizer, discou
     optimizer.step()
     return loss.item()
 
+def evaluate(env, model, render=False):
+    state = env.reset()
+    done = False
+    reward = 0.0
+    action = torch.tensor(0)
+
+    with torch.no_grad():
+        while not done:
+            value, action_space, (hidden, cells) = model(state, reward, action)
+            action_probabilities = F.softmax(action_space, dim=-1)
+            action_distribution = distributions.Categorical(action_probabilities)
+            action = action_distribution.sample()
+            if render:
+                env.render()
+            state, reward, done, _ = env.step(action.item())
+        return rewards
+
 def train(env, model, optimizer, discount_factor=0.9, render=False):
     state = env.reset()
     done = False
@@ -60,4 +77,4 @@ def train(env, model, optimizer, discount_factor=0.9, render=False):
         rewards.append(reward)
         entropies.append(action_distribution.entropy())
         log_prob_actions.append(log_prob_action.squeeze(0))
-    return update_model(rewards, values, log_prob_actions, entropies, optimizer), len(rewards)
+    return update_model(rewards, values, log_prob_actions, entropies, optimizer), rewards
