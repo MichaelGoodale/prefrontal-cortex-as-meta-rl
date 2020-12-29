@@ -6,6 +6,8 @@ from torch import nn
 import torch.nn.functional as F
 import torch.distributions as distributions
 
+from .utils import plot_grad_flow
+
 def get_discounted_returns(rewards, values, discount_factor):
     returns = []
     advantages = []
@@ -78,7 +80,7 @@ def train(env, model, optimizer, discount_factor=0.9, render=False):
         if render:
             env.render()
 
-        value, action_space, (hidden, cell) = model(state, reward, action, t, hidden=hidden, cell=cell)
+        value, action_space, (hidden, cell) = model(state, reward, action, hidden=hidden, cell=cell)
         action_distribution = distributions.Categorical(action_space)
         action = action_distribution.sample()
         log_prob_action = action_distribution.log_prob(action)
@@ -92,6 +94,6 @@ def train(env, model, optimizer, discount_factor=0.9, render=False):
         actions.append(action.item())
         rewards.append(reward)
         t += 1
-    value, action_space, (hidden, cell) = model(state, reward, action, t, hidden=hidden, cell=cell)
+    value, action_space, (hidden, cell) = model(state, reward, action, hidden=hidden, cell=cell)
     values.append(value.view(-1))
     return update_model(model, rewards, values, log_prob_actions, entropies, optimizer, discount_factor), rewards, actions
