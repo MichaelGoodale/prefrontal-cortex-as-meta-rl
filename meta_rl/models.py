@@ -13,8 +13,11 @@ class PrefrontalLSTM(nn.Module):
                 hidden_size=hidden_size)
         self.fc_policy = nn.Linear(hidden_size, n_actions)
         self.fc_value = nn.Linear(hidden_size, 1)
+        
+        self.initial_hidden = nn.Parameter(torch.zeros(1,1, hidden_size))
+        self.initial_cell = nn.Parameter(torch.zeros(1,1, hidden_size))
 
-    def forward(self, observation, prev_reward, prev_action, hidden=None, cell=None):
+    def forward(self, observation, prev_reward, prev_action, timestep, hidden=None, cell=None):
         '''Takes
             observation: Tensor,
             prev_reward: float,
@@ -27,6 +30,10 @@ class PrefrontalLSTM(nn.Module):
         observation = torch.FloatTensor(observation)
         prev_action = F.one_hot(prev_action.view(-1), self.n_actions).view(-1)
         prev_reward = torch.FloatTensor([prev_reward])
+        #timestep = torch.FloatTensor([timestep])
         src = torch.cat((observation, prev_reward, prev_action)).view(1, 1, -1)
-        output, (hidden, cells) = self.lstm(src)
-        return self.fc_value(output), self.fc_policy(output), (hidden, cells)
+        if hidden is None and cell is None:
+            output, (hidden, cell) = self.lstm(src, (self.initial_hidden, self.initial_cell))
+        else:
+            output, (hidden, cell) = self.lstm(src, (hidden, cell))
+        return self.fc_value(output), F.softmax(self.fc_policy(output), dim=-1), (hidden, cell)
