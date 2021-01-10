@@ -221,15 +221,3 @@ class TwoStepsGridWorld:
         ob = self.env.reset()
         #return self.featureExtractor.getFeatures(self.ob)
         return ob
-
-world = TwoStepsGridWorld()
-for i in range(100):
-    print(i)
-    print(world.reset())
-    print(world.step(2))
-    print(world.step(2))
-    print(world.step(1))
-    print(world.step(1))
-    print(world.step(1))
-    print(world.step(1))
-    print(world.reset())
