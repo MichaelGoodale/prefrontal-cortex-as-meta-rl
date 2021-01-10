@@ -80,7 +80,7 @@ def train(env, model, optimizer, discount_factor=0.9, render=False):
         if render:
             env.render()
 
-        value, action_space, (hidden, cell) = model(state, reward, action, hidden=hidden, cell=cell)
+        value, action_space, (hidden, cell) = model(state, reward, action.item(), hidden=hidden, cell=cell)
         action_distribution = distributions.Categorical(action_space)
         action = action_distribution.sample()
         log_prob_action = action_distribution.log_prob(action)

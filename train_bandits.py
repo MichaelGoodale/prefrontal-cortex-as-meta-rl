@@ -11,7 +11,7 @@ import gym
 model = PrefrontalLSTM(0, 2)
 model.train()
 optimizer = torch.optim.RMSprop(model.parameters(), lr=0.0007)
-env = TaskOne(mode='bandit_uncorr')
+env = TaskOne(mode='monkey')
 loss = []
 rewards = []
 t_range = tqdm(range(30000))
@@ -21,7 +21,7 @@ for i in t_range:
     loss.append(l)
     rewards.append(sum(r) / len(r))
 
-torch.save(model.state_dict(), 'model_bandit_uncorr.pt')
+torch.save(model.state_dict(), 'monkey_action_item.pt')
 fig, axs = plt.subplots(2)
 
 def smooth(X):

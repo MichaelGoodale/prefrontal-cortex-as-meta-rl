@@ -1,7 +1,7 @@
 #File where we define any necessary tasks for agent to learn
 import random
 import gym
-import utils
+from . import utils
 
 
 class TaskOne:
