@@ -210,14 +210,13 @@ class TwoStepsGridWorld:
             done = True
             self.env.done = True
 
-        #return self.featureExtractor.getFeatures(ob), reward, done, _
+        return self.featureExtractor.getFeatures(ob), reward, done, _
 
-        return ob, reward, done, _
 
     def reset(self):
 
         self.stage = 0
         self.env.rewards = self.rewards
         ob = self.env.reset()
-        #return self.featureExtractor.getFeatures(self.ob)
-        return ob
+        return self.featureExtractor.getFeatures(ob)
+        #return ob
