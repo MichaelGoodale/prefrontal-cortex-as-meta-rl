@@ -32,3 +32,28 @@ def plot_grad_flow(named_parameters):
                 Line2D([0], [0], color="b", lw=4),
                 Line2D([0], [0], color="k", lw=4)], ['max-gradient', 'mean-gradient', 'zero-gradient'])
     plt.show()
+
+
+##################################  Pour Gridworld #############################
+
+class FeatureExtractor(object):
+    def __init__(self):
+        super().__init__()
+
+    def getFeatures(self,obs):
+        pass
+
+class MapFromDumpExtractor2(FeatureExtractor):
+    def __init__(self,env):
+        super().__init__()
+        outSize=env.start_grid_map.reshape(1, -1).shape[1]
+        self.outSize=outSize*3
+
+    def getFeatures(self, obs):
+        state=np.zeros((3,np.shape(obs)[0],np.shape(obs)[1]))
+        state[0]=np.where(obs == 2,1,state[0])
+        state[1] = np.where(obs == 4, 1, state[1])
+        state[2] = np.where(obs == 6, 1, state[2])
+        return state.reshape(1,-1)
+
+#################################################################################
