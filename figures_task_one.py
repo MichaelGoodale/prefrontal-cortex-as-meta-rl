@@ -38,8 +38,8 @@ def figure_2_a(model_path):
     y = np.log2(C_r / C_l)
     x = np.log2(R_r / R_l)
 
-    plt.scatter(x[held_out], y[held_out], label="Held out parameters")
-    plt.scatter(x[~held_out], y[~held_out], label="Not held out")
+    plt.scatter(x[held_out], y[held_out], label="Held out parameters", c='red')
+    plt.scatter(x[~held_out], y[~held_out], label="Not held out", c='blue')
 
 
     lims = [
@@ -143,4 +143,4 @@ def figure_2_c(model_path):
         ax.set_xticks(range(15))
         ax.set_xticklabels(np.arange(15,0, -1))
     plt.show()
-figure_2_b('monkey_action_item.pt')
+figure_2_a('monkey_action_item.pt')
