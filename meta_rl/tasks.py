@@ -90,8 +90,7 @@ class TwoStep:
         self.reward = reward
         self.trials = trials
 
-        #dim 0 is state, dim 1 probability of reward for an action given a state,  may want to add asymmetricality
-        self.probability_reward = [[probability_reward, 1-probability_reward], [1-probability_reward, probability_reward]]
+        self.probability_reward = [probability_reward, 1-probability_reward]
 
         self.random_generator = random.Random(seed)
 
@@ -102,11 +101,12 @@ class TwoStep:
         if self.random_generator.uniform(0,1)<=p:
             self.probability_reward.reverse()
 
-    def reset(self):
+    def reset(self, probs=None):
         self.trial = 0
         self.state = [0,0]
         self.stage = 0
         self.shuffle(0.5)
+        return self.state
 
     def step(self, action):
         if self.stage == 0:
@@ -114,30 +114,30 @@ class TwoStep:
             self.shuffle(self.switch_rate)
 
             if self.random_generator.uniform(0,1) <= self.probability_transition:
+                state_transition = "common"
                 self.state[action] = 1
             else:
                 self.state[(action+1)%2] = 1
-
+                state_transition = "uncommon"
             r = 0
             self.stage = 1
 
         else:
-            if self.random_generator.uniform(0,1) <= self.probability_reward[self.state.index(1)][action]:
+            if self.random_generator.uniform(0,1) <= self.probability_reward[self.state.index(1)]:
                 r = self.reward
             else:
                 r = 0
-
+            state_transition = None
             self.state = [0,0]
             self.stage = 0
-
-        self.trial += 1
+            self.trial += 1
 
         if self.trial >= self.trials:
             done = True
         else:
             done = False
 
-        return self.state, r, done, None
+        return self.state, r, done, {"state_transition":  state_transition}
 
 class TwoStepsGridWorld:
     def __init__(self, seed=1337, probability_transition=0.8, probability_reward=0.9, switch_rate=0.025, trials=100):
