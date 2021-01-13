@@ -28,7 +28,6 @@ class PrefrontalLSTM(nn.Module):
             action_prob: Tensor[action_number]
         '''
         observation = torch.FloatTensor(observation)
-        #prev_action = F.one_hot(prev_action.view(-1), self.n_actions).view(-1)
         prev_action = F.one_hot(torch.tensor(prev_action), self.n_actions).view(-1)
         prev_reward = torch.FloatTensor([prev_reward])
         src = torch.cat((observation, prev_reward, prev_action)).view(1, 1, -1)

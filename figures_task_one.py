@@ -20,7 +20,7 @@ def figure_2_a(model_path):
     R_r = []
     R_l = []
     held_out = []
-    for _ in range(500):
+    for _ in range(4000):
         actions, rewards = run_episode(env, model)
         p_l, _ = (env.initial_probability)
         held_out.append((0.1 < p_l < 0.2) or (0.3 < p_l < 0.4))
@@ -70,7 +70,7 @@ def figure_2_b(model_path):
     action_mat = []
     reward_mat = []
     value_mat = []
-    for _ in range(500):
+    for _ in range(4000):
         actions, rewards, values = run_episode(env, model, return_values=True)
         reward_mat.append(rewards)
         action_mat.append(actions)
@@ -108,7 +108,7 @@ def figure_2_c(model_path):
     X_actions = []
     X_rewards = []
     y = []
-    for _ in range(500):
+    for _ in range(4000):
         actions, rewards = run_episode(env, model)
         for i, a in enumerate(actions):
             if i <= 33+15:
@@ -143,4 +143,7 @@ def figure_2_c(model_path):
         ax.set_xticks(range(15))
         ax.set_xticklabels(np.arange(15,0, -1))
     plt.show()
+
 figure_2_a('monkey_action_item.pt')
+figure_2_b('monkey_action_item.pt')
+figure_2_c('monkey_action_item.pt')

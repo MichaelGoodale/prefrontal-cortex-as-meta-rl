@@ -21,13 +21,14 @@ def cumulative_regret(probabilities, rewards):
         regrets.append(expected_sum - reward_sum)
     return regrets
 
-def run_episode(env, model, probs=None, return_values=False):
+def run_episode(env, model, probs=None, return_values=False, return_infos=False):
     state = env.reset(probs)
     done = False
     reward = 0.0
     rewards = []
     actions = []
     values = []
+    infos = []
     action = torch.tensor(0)
     hidden = None
     cell = None
@@ -36,13 +37,17 @@ def run_episode(env, model, probs=None, return_values=False):
             value, action_space, (hidden, cell) = model(state, reward, action, hidden=hidden, cell=cell)
             action_distribution = distributions.Categorical(action_space)
             action = action_distribution.sample()
-            state, reward, done, _ = env.step(action.item())
+            state, reward, done, info = env.step(action.item())
             actions.append(action.item())
             rewards.append(reward)
             values.append(value.item())
-        if return_values:
-            return actions, rewards, values
-        return actions, rewards
+            infos.append(info)
+    return_ = [actions, rewards]
+    if return_values:
+        return_.append(values)
+    if return_infos:
+        return_.append(infos)
+    return return_
 
 def get_regrets(model_path, probabilities=[0.75, 0.25], n_samples=500):
     model = PrefrontalLSTM(0, 2)
