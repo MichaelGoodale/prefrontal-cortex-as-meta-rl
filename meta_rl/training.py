@@ -89,7 +89,6 @@ def train(env, model, optimizer, discount_factor=0.9, render=False):
 
 
         state, reward, done, _ = env.step(action.item())
-
         values.append(value.view(-1))
         actions.append(action.item())
         rewards.append(reward)

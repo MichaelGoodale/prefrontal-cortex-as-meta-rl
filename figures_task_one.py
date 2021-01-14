@@ -26,8 +26,8 @@ def figure_2_a(model_path):
         held_out.append((0.1 < p_l < 0.2) or (0.3 < p_l < 0.4))
         C_r.append(sum(actions))
         C_l.append(len(actions) - C_r[-1])
-        R_r.append(sum([r for a, r in zip(actions, rewards) if a == 1]))
-        R_l.append(sum([r for a, r in zip(actions, rewards) if a == 0]))
+        R_r.append(1+sum([r for a, r in zip(actions, rewards) if a == 1]))
+        R_l.append(1+sum([r for a, r in zip(actions, rewards) if a == 0]))
 
     C_r = np.array(C_r)
     C_l = np.array(C_l)
@@ -37,9 +37,11 @@ def figure_2_a(model_path):
 
     y = np.log2(C_r / C_l)
     x = np.log2(R_r / R_l)
+    m = LinearRegression()
+    m.fit(x.reshape(-1, 1), y.reshape(-1, 1))
 
-    plt.scatter(x[held_out], y[held_out], label="Held out parameters", c='red')
-    plt.scatter(x[~held_out], y[~held_out], label="Not held out", c='blue')
+    plt.scatter(x[~held_out], y[~held_out], label="Not held out", c='blue', s=5)
+    plt.scatter(x[held_out], y[held_out], label="Held out parameters", c='red', s=5)
 
 
     lims = [
@@ -48,6 +50,8 @@ def figure_2_a(model_path):
     ]
 
     plt.plot(lims, lims, 'k-', zorder=0)
+    test_X = np.arange(*plt.xlim(), 0.25)
+    plt.plot(test_X, m.predict(test_X.reshape(-1, 1)), linestyle='--', zorder=0, color='gray')
     plt.ylabel(r'$\log_2(\frac{C_R}{C_L})$', fontsize=20)
     plt.xlabel(r'$\log_2(\frac{R_R}{R_L})$', fontsize=20)
     plt.legend()
@@ -70,7 +74,7 @@ def figure_2_b(model_path):
     action_mat = []
     reward_mat = []
     value_mat = []
-    for _ in range(4000):
+    for _ in range(2000):
         actions, rewards, values = run_episode(env, model, return_values=True)
         reward_mat.append(rewards)
         action_mat.append(actions)
@@ -78,11 +82,12 @@ def figure_2_b(model_path):
     action_mat = np.array(action_mat)
     value_mat = np.array(value_mat)
     reward_mat = np.array(reward_mat)
-    activation_mat = torch.cat([x[0] for i, x in enumerate(activations['lstm']) if i % 100 != 0]).squeeze().numpy()
-    value_corr, _ = spearmanr(activation_mat, value_mat[:, 1:].reshape(-1), axis=0)
-    action_corr, _ = spearmanr(activation_mat, action_mat[:, :-1].reshape(-1), axis=0)
-    reward_corr, _ = spearmanr(activation_mat, reward_mat[:, :-1].reshape(-1), axis=0)
-    rewardxaction_corr, _ = spearmanr(activation_mat, reward_mat[:, :-1].reshape(-1) * action_mat[:, :-1].reshape(-1), axis=0)
+    #activation_mat = torch.cat([x[0] for i, x in enumerate(activations['lstm']) if i % 100 != 0 and i%100 != 1]).squeeze().numpy()
+    activation_mat = torch.cat([x[0] for i, x in enumerate(activations['lstm']) if i % 100 != 0 and i % 100 != 1]).squeeze().numpy()
+    value_corr, _ = spearmanr(activation_mat, value_mat[:, 2:].reshape(-1), axis=0)
+    action_corr, _ = spearmanr(activation_mat, action_mat[:, 2:].reshape(-1), axis=0)
+    reward_corr, _ = spearmanr(activation_mat, reward_mat[:, :-2].reshape(-1), axis=0)
+    rewardxaction_corr, _ = spearmanr(activation_mat, reward_mat[:, :-2].reshape(-1) * action_mat[:, 2:].reshape(-1), axis=0)
 
     value_corr = np.abs(value_corr[:-1, -1])
     action_corr = np.abs(action_corr[:-1, -1])
@@ -144,6 +149,6 @@ def figure_2_c(model_path):
         ax.set_xticklabels(np.arange(15,0, -1))
     plt.show()
 
-figure_2_a('monkey_action_item.pt')
+#figure_2_a('monkey_action_item.pt')
 figure_2_b('monkey_action_item.pt')
-figure_2_c('monkey_action_item.pt')
+#figure_2_c('monkey_action_item.pt')

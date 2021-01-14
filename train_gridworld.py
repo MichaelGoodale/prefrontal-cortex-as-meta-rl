@@ -1,6 +1,6 @@
 from meta_rl.models import PrefrontalLSTM
 from meta_rl.training import train
-from meta_rl.tasks import TaskOne, TwoStep, HumanTwoStep
+from meta_rl.tasks import TaskOne, TwoStepsGridWorld
 import torch
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -8,20 +8,21 @@ import numpy as np
 from scipy.interpolate import make_interp_spline, BSpline
 import gym
 
-model = PrefrontalLSTM(2, 2, hidden_size=192)
+model = PrefrontalLSTM(126, 4, hidden_size=192)
 model.train()
 optimizer = torch.optim.RMSprop(model.parameters(), lr=0.0007)
-env = HumanTwoStep()
+env = TwoStepsGridWorld()
+state = env.reset()
 loss = []
 rewards = []
-t_range = tqdm(range(30000))
+t_range = tqdm(range(10000))
 for i in t_range:
     l, r, a = train(env, model, optimizer, discount_factor=0.90)
-    t_range.set_description("Current loss: {:10.2f}".format(l))
+    t_range.set_description("Current r: {:10.2f}".format(sum(r)))
     loss.append(l)
-    rewards.append(sum(r) / len(r))
+    rewards.append(sum(r))
 
-torch.save(model.state_dict(), 'human_task_two_30k_192.pt')
+torch.save(model.state_dict(), 'grid_world_2.pt')
 fig, axs = plt.subplots(2)
 
 def smooth(X):
@@ -36,4 +37,4 @@ axs[0].set_title("Loss")
 axs[1].plot(smooth(rewards))
 axs[1].plot(rewards, alpha=0.25)
 axs[1].set_title("Rewards")
-plt.savefig("human_task_30k_192.png")
+plt.savefig("grid_world_2.png")

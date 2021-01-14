@@ -1,6 +1,6 @@
 from cumulative_regret import run_episode
 from meta_rl.models import PrefrontalLSTM
-from meta_rl.tasks import TwoStep
+from meta_rl.tasks import TwoStep, HumanTwoStep
 
 import numpy as np
 import torch
@@ -55,6 +55,7 @@ def figure_5_b(model_path, N=8, episodes=500):
     plt.scatter(np.tile(np.arange(2) - width / 2 - gap, N), commons.reshape(-1), c='black')
     plt.scatter(np.tile(np.arange(2) + width / 2 + gap, N), uncommons.reshape(-1), c='black')
     plt.xticks((0,1), labels=["Rewarded", "Unrewarded"])
+    plt.ylim(0.5, 1)
     plt.legend()
     plt.show()
 
@@ -92,7 +93,7 @@ def figure_5_d(model_path, N=8, episodes=500):
                     first_actions.append(action)
                     state_transition = info['state_transition']
             for i, outcome in enumerate(outcomes[4:]):
-                idx = i+5+1 #account for the fact that the first outcome is the second trial
+                idx = i+5
                 X.append(trial_types[idx-5:idx])
             y += outcomes[4:]
         X = np.array(X) #(N_samples, t, reward_type)
@@ -115,6 +116,4 @@ def figure_5_d(model_path, N=8, episodes=500):
     plt.xlabel('Trials ago')
     plt.show()
 
-
-
-figure_5_d('task_two_50k.pt', N=8, episodes=500)
+figure_5_b('task_two_20k.pt', N=8, episodes=500)

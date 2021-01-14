@@ -157,29 +157,14 @@ class GridworldEnv(discrete.DiscreteEnv):
     def step(self, action):
         self.nbSteps += 1
         c = self.start_grid_map[self.currentPos[0],self.currentPos[1]]
-        if c==3 or c==5 or c==6 : ## Done == True au coup d'avant
-            return self.current_grid_map,0,True,{}
         action = int(action)
-        p = np.random.rand()
-        if p<0.2:
-            p = np.random.rand()
-            if action==0 or action==1:
-                if p < 0.5:
-                    action=2
-                else:
-                    action=3
-            else:
-                if p < 0.5:
-                    action=0
-                else:
-                    action=1
         npos = (self.currentPos[0] + self.actions[action][0], self.currentPos[1] + self.actions[action][1])
         rr=-1*(self.nbSteps>self.nbMaxSteps)
         if npos[0] >= self.current_grid_map.shape[0] or npos[0] < 0 or npos[1] >= self.current_grid_map.shape[1] or npos[1] < 0 or self.current_grid_map[npos[0],npos[1]]==1:
             return (self.current_grid_map, self.rewards[0]+rr, self.nbSteps>self.nbMaxSteps, {})
         c=self.current_grid_map[npos]
         r = self.rewards[c]+rr
-        done=(c == 3 or c == 5 or self.nbSteps>self.nbMaxSteps)
+        done=(c == 5 or c == 6 or self.nbSteps>self.nbMaxSteps)
         self.current_grid_map[self.currentPos[0],self.currentPos[1]] = 0
         self.current_grid_map[npos[0],npos[1]] = 2
         self.currentPos = npos

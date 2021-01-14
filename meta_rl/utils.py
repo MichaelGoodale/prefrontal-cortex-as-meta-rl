@@ -54,6 +54,6 @@ class MapFromDumpExtractor2(FeatureExtractor):
         state[0]=np.where(obs == 2,1,state[0])
         state[1] = np.where(obs == 4, 1, state[1])
         state[2] = np.where(obs == 6, 1, state[2])
-        return state.reshape(1,-1)
+        return state.reshape(1, -1)
 
 #################################################################################
